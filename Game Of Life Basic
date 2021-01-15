@@ -1,0 +1,199 @@
+ /*Jackson Fry,
+Dec 11 2020,
+
+Backbones of Conway's Game of Life  
+
+Slightly modified version of Dan Shiffman's Coding Challenge #85: The Game Of Life
+https://thecodingtrain.com/CodingChallenges/085-the-game-of-life.html
+
+
+Data dictionary
+***************************
+    
+  SETUP:  
+    grid - 2d array, holds values to display as squares (1 =     white,   0 = black / invisible) 
+  
+    col - the number of coloumbs (determined by canvas width and res)
+  
+    row - the number of rows (determined by canvas height and res)
+  
+    res - how big each space on the grid will be
+    
+  
+  COUNTERS:
+    i / x - counter for x values (for the array [i] [])
+  
+    j / y - counter for y values (for the array  [][j])
+    
+    neighbours - stores number of "live" neighbours (live means a value of 1)
+
+*****************************
+*/
+
+//setup
+
+//fuction that makes 2d arrays based on two given values              
+function make2DArray(col, row)
+{
+  //initial 1D array
+  let arrayBase = new Array(col);
+  //looping through that array we just made
+  for (let i = 0; i < arrayBase.length; i++)
+    {
+      //making each position in that 1D array
+      //into and array, making a 2D array
+      arrayBase[i] = new Array(row);
+    }
+  
+  //returning the array
+  return arrayBase;
+}
+
+//declaring important setup variables
+
+//the base array
+let grid;
+
+//the number of columbs in that array
+let cols;
+
+//the number of rows in that array
+let rows;
+
+//the size (in pixels) of each space in the array
+//lowering means more spaces in the array
+let res = 10;
+
+
+function setup() {
+  //making canvas
+  createCanvas(600, 600);
+  
+  /*determining how many columbs and rows there
+  should be based on canvas size and res*/
+  cols = width / res;
+  rows = height / res;
+  
+  //setting fill colour
+  fill(255)
+  
+  //making grid into a 2d array
+  grid = make2DArray (cols, rows);
+  
+  //filling in grid with random values (0 or 1)
+  for(let i = 0; i < cols; i++)
+    {
+    for(let j = 0; j < rows; j++)
+      {
+        grid[i][j] = floor(random(2));
+        
+      }
+    }
+}
+
+
+
+//running draw function to loop calculations and redraw screen
+function draw() 
+{
+  background(0,0,0);
+  
+  //drawing squares
+  
+  //looping through the array
+  for (let i = 0; i<cols; i++)
+    {
+      for(let j = 0; j< rows; j++)
+      {
+        //making each square
+        if (grid[i][j] === 1)
+        {
+          //drawing each position of the array as a square
+          rect (i*res, j*res, res-1, res-1) ;
+        }
+      }   
+    }
+  
+
+
+  //array used to update the grid's state after all calculations are finished
+  //The reason no updates are applied directly to the main grid is because changing 
+  //any aspect of the main grid will throw off following calculations.
+  let newState = make2DArray (cols, rows);
+  
+  
+  
+  //counting neighbors and applying new state
+  //looping through array
+  for (let i = 0; i < cols; i++)
+    {
+      for(let j = 0; j < rows; j++)
+      {
+        //count live neighbours
+        //countNeighbours function is at the bottom of the editor
+        let neighbours = countNeighbours (grid, i, j);
+        
+        //making a dead cell live
+        if (grid[i][j] === 0 && neighbours === 3)
+        {
+          newState[i][j] = 1;
+        }
+        
+        //making a live cell dead
+        else if (grid[i][j] === 1 && (neighbours < 2 || neighbours >3))
+        {
+          newState[i][j] = 0;
+        }
+        
+        //keeping the state the same
+        else
+        {
+          newState[i][j] = grid[i][j];
+        }
+        
+      }   
+    }
+    
+  
+  //set grid to newstate for next cycle
+  grid = newState;
+}
+
+
+
+
+
+//neighbour counter function
+function countNeighbours (grid, x, y)
+{
+  //variable for counting live neighbors
+  let neighbours = 0;
+  
+  //counting
+  for (let i = -1; i<2; i++)
+    {
+      for(let j = -1; j< 2; j++)
+      {
+        
+        //wrap around edges
+        //ADD I AND J VALUES TOO X AND Y TO GET THE CORRECT POSITIONS
+        let col = (cols+ x + i) % cols;
+        let row = (rows+ y + j) % rows;
+        
+        //adding value of array position   
+        neighbours += grid[col][row];
+        
+      }
+    }
+  
+  //subtracting value of current grid position 
+  
+  /* This is because we add the value of 
+  the array's position even when it doesn't
+  count towards the amount of neighbours.  */
+  neighbours -= grid[x][y];
+ 
+  return neighbours;
+}
+
+
