@@ -1,0 +1,190 @@
+ /*Jackson Fry,
+Jan 8, 2020,
+
+OBJECT ORIENTED VER
+*/
+
+
+
+//setup
+
+function make2DArray(col, row)
+{
+  let arrayBase = new Array(col);
+  for (let i = 0; i < arrayBase.length; i++)
+    {
+        arrayBase[i] = new Array(row);
+    }
+  
+  //returning array
+  return arrayBase;
+}
+
+
+var Grid = function(col , row)
+{
+  this.array;
+  
+  this.arrayUpdate;
+  
+  //neighbour count
+  this.neighbours = 0;
+
+  
+  this.array = new make2DArray (col, row);
+  this.arrayUpdate = new make2DArray (col, row);
+
+};
+  
+
+
+Grid.prototype.generate = function ()
+{
+    
+    for(let i = 0; i < this.array.length; i++)
+    {
+      for(let j = 0; j < this.array[i].length; j++)
+      {
+        this.array[i][j] = floor(random(2));
+        
+      }
+    }
+  
+};
+
+Grid.prototype.count = function (x, y)
+{
+  //neighbour counter
+  let n = 0;
+  this.neighbours = 0;
+    for (let i = -1; i<2; i++)
+    {
+       for(let j = -1; j< 2; j++)
+      {   
+        
+         //wrap around edges
+         //ADD I AND J VALUES TOO X AND Y TO GET THE CORRECT POSITIONS
+         let setCol = (this.array.length+ x + i) % this.array.length;
+         let setRow = (this.array[0].length+ y + j) % this.array[0].length;        
+         //adding value of array position
+        n += this.array[setCol][setRow];
+       //  this.neighbours += this.array[setCol][setRow];
+       
+         //subtracting current grid position as it does not count for 
+       }
+    }
+     n -= this.array[x][y];
+    this.neighbours = n;
+    return n;    
+};
+
+
+Grid.prototype.update = function()
+{
+  //variable for counting live neighbors
+  //let neighbours = 0;
+  
+
+  //col count
+  for(let x = 0; x < this.array.length; x++)
+    {
+      //row count
+      for(let y = 0; y < this.array[x].length; y++)
+      {
+        //gets
+        this.count(x, y);
+
+        //update based on neighbour count
+        
+        //becomes alive
+        if(this.array[x][y] === 0 && this.neighbours === 3)
+        {
+          this.arrayUpdate[x][y] = 1;
+        }  
+        
+        //dies
+        else if (this.array[x][y] === 1 && (this.neighbours > 3 || this.neighbours < 2))
+        {
+          this.arrayUpdate[x][y] = 0;
+        } 
+        
+        //stays the same
+        else 
+        {
+         this.arrayUpdate[x][y] = this.array[x][y];
+        }
+      }
+    }
+   
+   //update the array   
+  this.array = this.arrayUpdate;
+  this.arrayUpdate = make2DArray(this.array.length,this.array[0].length);
+};
+
+
+//display
+Grid.prototype.display = function(resolution)
+{
+  
+  //will live = green 
+  //will die = red
+  //close to living (death but 1 off) = purple
+  let colours = ['#ff0000','#ff00ff', '#00ff00', '#00ff00', '#ff00ff', '#ff0000', '#ff0000', '#ff0000', '#ff0000'];
+  
+  for(let i = 0; i < this.array.length; i++)
+    {
+      for(let j = 0; j < this.array[i].length; j++)
+      {
+        if (this.array[i][j] === 1)
+          {
+            this.count(i, j);
+            let clr = this.neighbours;
+            
+            fill(colours[clr]);
+            rect (i*resolution, j*resolution, resolution-1, resolution-1);
+          }
+
+      }   
+    }
+};
+
+
+
+
+//the number of columbs in that array
+let cols;
+//the number of rows in that array
+let rows;
+
+//the size  of each space in the array
+//lowering means more spaces in the array
+let res = 10;
+
+let grid;
+
+function setup() 
+{
+  //making canvas
+  createCanvas(600, 600);
+  /*determining how many columbs and rows there
+  should be based on canvas size and res*/
+  cols = width / res;
+  rows = height / res;
+  grid = new Grid(cols, rows);  
+ grid.generate();
+ 
+}
+
+//making grid into a 2d array  
+//  var grid = new Grid(cols, rows);
+  //filling in grid with random values (0 or 1)
+//  grid.generate();
+
+//running draw function to loop calculations and redraw screen
+function draw() 
+{
+  background(0,0,0);
+  grid.update();
+  grid.display(res);
+
+}
