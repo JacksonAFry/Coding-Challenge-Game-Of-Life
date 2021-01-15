@@ -6,28 +6,6 @@ Backbones of Conway's Game of Life
 Slightly modified version of Dan Shiffman's Coding Challenge #85: The Game Of Life
 https://thecodingtrain.com/CodingChallenges/085-the-game-of-life.html
 
-
-Data dictionary
-***************************
-    
-  SETUP:  
-    grid - 2d array, holds values to display as squares (1 =     white,   0 = black / invisible) 
-  
-    col - the number of coloumbs (determined by canvas width and res)
-  
-    row - the number of rows (determined by canvas height and res)
-  
-    res - how big each space on the grid will be
-    
-  
-  COUNTERS:
-    i / x - counter for x values (for the array [i] [])
-  
-    j / y - counter for y values (for the array  [][j])
-    
-    neighbours - stores number of "live" neighbours (live means a value of 1)
-
-*****************************
 */
 
 //setup
